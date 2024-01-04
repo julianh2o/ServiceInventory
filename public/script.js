@@ -37,4 +37,45 @@ $(document).ready(() => {
         $el.parent().find(".hideParent").addClass("showHidden");
         $el.hide();
     });
+
+    let modalService = null;
+
+    $(".iconContainer img").click((e) => {
+        const $el = $(e.target);
+        modalService = $el.data("service");
+        $(".modal-title").text(`Upload Icon: ${modalService}`);
+        $('#uploadModal').modal("show");
+    });
+
+    $(".closeModal").click(() => {
+        $('#uploadModal').modal("hide");
+        $("#favicon").val(null);
+    });
+
+    $('#upload-form').submit(function(e) {
+        e.preventDefault();
+
+        let formData = new FormData();
+        let fileInput = document.getElementById('favicon');
+        let file = fileInput.files[0];
+        formData.append('favicon', file);
+
+        const [ip,port] = modalService.split(":");
+
+        axios.post(`/hosts/${ip}/services/${port}/icon`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        .then(function (response) {
+            const filename = response.data.filename;
+            $(`img[data-service='${modalService}']`).attr("src",filename);
+            $('#upload-status').html(`<p>File uploaded successfully. Filename: ${response.data.filename}</p>`);
+            $('#uploadModal').modal("hide");
+            $("#favicon").val(null);
+        })
+        .catch(function (error) {
+            $('#upload-status').html(`<p>Error uploading file: ${error.message}</p>`);
+        });
+    });
 });

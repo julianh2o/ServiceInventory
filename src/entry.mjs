@@ -1,6 +1,4 @@
 import 'express-async-errors';
-import logger from './core/logger.js';
-import secrets from './core/secrets.ts';
 import express from 'express';
 import nmap from 'node-nmap';
 import fs from 'fs/promises';
@@ -14,10 +12,37 @@ import { createWriteStream } from 'fs';
 import path from 'path';
 import * as uuid from 'uuid';
 import { fileTypeFromBuffer } from 'file-type';
+import crypto from "crypto";
+import multer from "multer";
+import { parseFavicon } from 'parse-favicon'
 
-async function downloadLargestFavicon(url: string): Promise<string> {
+const PORT = 4004;
+const HOST = "localhost";
+
+async function fetchFavicons(url) {
+  return new Promise((resolve, reject) => {
+    const results  = [];
+    parseFavicon(
+      url,
+      async (url) => fetch(url).then(res => res.text()),
+      async (rel) => fetch(`${url}${rel}`).then(res => res.arrayBuffer())
+    ).subscribe({
+      next(icon) { results.push(icon) },
+      error(err) { reject(err) },
+      complete() { resolve(results) },
+    })
+  })
+}
+
+async function downloadLargestFavicon(url) {
+  console.log(`Downloading Favicon for ${url}`)
+  const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
   try {
     // Fetch the HTML content of the website
+    if (url.includes("6789")) {
+      const favicons = await fetchFavicons(url);
+      console.log(favicons);
+    }
     const response = await axios.get(url);
     const html = response.data;
 
@@ -30,59 +55,48 @@ async function downloadLargestFavicon(url: string): Promise<string> {
     let largestFaviconUrl = '';
     let largestFaviconSize = 0;
 
-    // Iterate through the favicon links to find the largest one
+    // Iteratethrough the favicon links to find the largest one
+
     faviconLinks.each((_index, element) => {
       const faviconUrl = $(element).attr('href');
       const faviconSizeStr = $(element).attr('sizes');
       const faviconSize = faviconSizeStr ? parseInt(faviconSizeStr) : 0;
 
-      if (faviconSize > largestFaviconSize) {
+      if (!largestFaviconSize || faviconSize > largestFaviconSize) {
         largestFaviconSize = faviconSize;
         largestFaviconUrl = faviconUrl || '';
       }
     });
 
-    if (largestFaviconUrl) {
-      // Download the largest favicon
-      console.log('fetching', `${url}${largestFaviconUrl}`);
-      const faviconResponse = await axios.get(`${url}${largestFaviconUrl}`, {
-        responseType: 'stream',
-      });
-      const faviconStream = faviconResponse.data;
+    if (!largestFaviconUrl) throw new Error('No favicon found on the website ' + url);
 
-      // Generate a unique filename with an appropriate extension
-      // const buf = Buffer.from(faviconStream);
-      console.log(await fileTypeFromBuffer(Buffer.from('')));
-      const extension = path.extname(largestFaviconUrl) || '.ico';
-      const filename = `./ico/${uuid.v4()}${extension}`;
+    if (largestFaviconUrl.startsWith(".")) largestFaviconUrl = largestFaviconUrl.substring(1);
+    if (!largestFaviconUrl.startsWith("/")) largestFaviconUrl = `/${largestFaviconUrl}`;
+    console.log("Downloading favicon from: "+`${url}${largestFaviconUrl}`)
+    const faviconResponse = await axios.get(`${url}${largestFaviconUrl}`, {
+      responseType: 'arraybuffer',
+    });
+    const buf = faviconResponse.data;
 
-      // Create a write stream to save the favicon locally
-      const writeStream = createWriteStream(filename);
+    let {ext} = await fileTypeFromBuffer(buf);
+    if (ext === "xml") ext = "svg";
+    var hash = crypto.createHash('sha1');
+    hash.setEncoding("hex");
+    hash.write(buf);
+    hash.end();
+    const name = hash.read();
+    const filename = `./ico/${name}.${ext}`;
 
-      faviconStream.pipe(writeStream);
-
-      return new Promise<string>((resolve, reject) => {
-        writeStream.on('finish', () => {
-          console.log(`Downloaded largest favicon to ${filename}`);
-          resolve(filename);
-        });
-
-        writeStream.on('error', (error) => {
-          console.error('Error while saving favicon:', error);
-          reject(error);
-        });
-      });
-    } else {
-      throw new Error('No favicon found on the website ' + url);
-    }
+    await fs.writeFile(filename,buf);
+    return filename;
   } catch (cause) {
-    throw new Error('Error while downloading favicon:' + cause.message);
+    throw new Error('Error while downloading favicon: '+cause.message, {cause});
   }
 }
 
-function runNmap(host: string, fast: boolean): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const args: string[] = [];
+function runNmap(host, fast){
+  return new Promise((resolve, reject) => {
+    const args = [];
 
     if (fast) {
       args.push('-sS', '-F');
@@ -115,10 +129,10 @@ function runNmap(host: string, fast: boolean): Promise<string> {
   });
 }
 
-function parseNmapOutput(output: string): HostInfo[] {
-  const hosts: HostInfo[] = [];
+function parseNmapOutput(output) {
+  const hosts = [];
   const lines = output.split('\n');
-  let currentHost: HostInfo | null = null;
+  let currentHost = null;
 
   for (const line of lines) {
     if (line.startsWith('Nmap scan report for ')) {
@@ -158,19 +172,7 @@ function parseNmapOutput(output: string): HostInfo[] {
   return hosts;
 }
 
-interface HostInfo {
-  ip: string;
-  openPorts: PortInfo[];
-}
-
-interface PortInfo {
-  port: number;
-  protocol: string;
-  state: string;
-  service: string;
-}
-
-async function getTitleFromUrl(url: string): Promise<string> {
+async function getTitleFromUrl(url) {
   try {
     console.time(`Fetching Page Title: ${url}`);
     const response = await axios.get(url, { timeout: 1000 });
@@ -185,7 +187,7 @@ async function getTitleFromUrl(url: string): Promise<string> {
 
     return title || ogTitleElement;
   } catch (error) {
-    logger.error(`Error fetching title for ${url}: ${error.message}`);
+    console.error(`Error fetching title for ${url}: ${error.message}`);
     return null;
   } finally {
     console.timeEnd(`Fetching Page Title: ${url}`);
@@ -195,7 +197,7 @@ async function getTitleFromUrl(url: string): Promise<string> {
 const HOST_CACHE = './cache.json';
 const CONFIG_PATH = './config.json';
 
-const scan = async (host: string, fast: boolean) => {
+const scan = async (host, fast) => {
   console.log(`Starting scan: ${host} ${fast ? '(fast)' : ''}`);
   console.time(`Scan ${host} ${fast ? '(fast)' : ''}`);
   const raw = await runNmap(host, fast);
@@ -204,7 +206,7 @@ const scan = async (host: string, fast: boolean) => {
   return parsed;
 };
 
-const scanNmap = async (host: string, fast: boolean) => {
+const scanNmap = async (host, fast) => {
   return new Promise((resolve, reject) => {
     console.log(`Starting scan: ${host} ${fast ? '(fast)' : ''}`);
     console.time(`Scan ${host} ${fast ? '(fast)' : ''}`);
@@ -234,7 +236,7 @@ const saveJson = async (o, p) => {
   await fs.writeFile(p, JSON.stringify(o, undefined, 2), 'utf-8');
 };
 
-const getConfig = (ip: string, port?: number) => {
+const getConfig = (ip, port) => {
   let hostMatch = _.find(config.hosts, { ip });
   if (!hostMatch) {
     // Create the host entry
@@ -257,7 +259,7 @@ const getConfig = (ip: string, port?: number) => {
 let hosts = [];
 const tick = async () => {
   console.time('Port scan');
-  const newHosts = (hosts = (await scan('192.168.0.200', true)) as any[]);
+  const newHosts = await scan('192.168.0.200', true);
   const processedHosts = await p.mapSeries(newHosts, async (hostRaw) => {
     const host = _.cloneDeep(hostRaw);
     host.openPorts = host.openPorts ?? [];
@@ -267,7 +269,7 @@ const tick = async () => {
     host.name = host.hostname ?? '';
 
     if (host.favorite) Object.assign(host, _.first(await scan(host.ip, false)));
-    host.openPorts = await p.mapSeries(host.openPorts, async (svc: any) => {
+    host.openPorts = await p.mapSeries(host.openPorts, async (svc) => {
       // console.log(`${host.ip}:${svc.port} ${svc.service}`);
       svc = _.cloneDeep(svc);
       const serviceUrl = `http://${host.ip}:${svc.port}`;
@@ -280,10 +282,10 @@ const tick = async () => {
         icon =
           svc.protocol === 'tcp' && (await downloadLargestFavicon(serviceUrl));
       } catch (err) {
-        logger.error(`Failed to download icon: ${serviceUrl} ${err.message}`);
+        console.error(`Failed to download icon: ${serviceUrl} ${err.message}`);
       }
       svc.name = titleFromUrl || svc.service || '';
-      svc.ico = icon && icon.substring(1);
+      svc.icon = icon && icon.substring(1);
       return svc;
     });
     return host;
@@ -321,19 +323,18 @@ const defaultHost = {
 
 const defaultService = {};
 
-let config: any = {};
+let config = {};
 const defaultConfig = {
   ignoreList: ['upnp', 'https-alt', 'ajp13'],
   hosts: [],
 };
 
-tick();
 const SCAN_FREQUENCY_MINUTES = 30;
 
 const app = express();
 app.set('view engine', 'pug');
 app.use(express.static('public'));
-app.use(express.static('ico'));
+app.use("/ico",express.static('ico'));
 
 app.get('/', async (_req, res) => {
   res.render('index', {
@@ -341,6 +342,38 @@ app.get('/', async (_req, res) => {
     message: 'Hello there!',
     hosts: await processHosts(hosts, config),
   });
+});
+
+const upload = multer({ storage: multer.memoryStorage() });
+app.post('/hosts/:ip/services/:port/icon', upload.single('favicon'), async (req, res) => {
+  try {
+    if (!req.file) {
+      throw new Error('No file uploaded');
+    }
+
+    const buffer = req.file.buffer;
+    const { ext } = await fileTypeFromBuffer(buffer);
+
+    // Generating a SHA-1 hash of the file's content
+    var hash = crypto.createHash('sha1');
+    hash.update(buffer);
+    const name = hash.digest('hex');
+    const filename = `./ico/${name}.${ext}`;
+
+    const {ip,port} = req.params;
+    const serviceConfig = getConfig(ip,parseInt(port));
+    serviceConfig.icon = filename.substring(1);
+    await saveJson(config, CONFIG_PATH);
+    console.log(`Uploaded icon for ${ip}:${port}`);
+
+    // Saving the file
+    await fs.writeFile(filename, buffer);
+
+    res.send({ message: 'File uploaded successfully', filename });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error processing file', error: error.message });
+  }
 });
 
 app.post(
@@ -362,22 +395,24 @@ app.use('/_healthcheck', (_req, res) => {
 });
 
 async function main() {
-  await app.listen({ port: secrets.PORT, host: secrets.HOST }, async () => {
+  await app.listen({ port: PORT, host: HOST }, async () => {
     hosts = await loadJson(HOST_CACHE, []);
     config = await loadJson(CONFIG_PATH, defaultConfig);
+    // const res = await downloadLargestFavicon("http://192.168.0.200:5076/");
+    // console.log(res);
+    await tick();
     setTimeout(tick, SCAN_FREQUENCY_MINUTES * 60 * 60 * 1000);
   });
-  logger.info(`Running at http://${secrets.HOST}:${secrets.PORT}`);
+  console.log(`Running at http://${HOST}:${PORT}`);
 }
 
 app.use((err, req, res, next) => {
   console.error(err);
-  logger.error(err);
   res.status(500).send('Something broke!');
 });
 
 process.on('unhandledRejection', (err) => {
-  if (err) logger.error(err);
+  if (err) console.error(err);
 });
 
 main();

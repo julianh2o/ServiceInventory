@@ -266,7 +266,8 @@
           "port": 9001
         },
         {
-          "port": 3579
+          "port": 3579,
+          "icon": "/ico/7c2a676f16dcd0e07c2e8dfda0bdbc0614705df3.png"
         },
         {
           "port": 5076
@@ -291,6 +292,10 @@
         {
           "port": 52745,
           "hidden": true
+        },
+        {
+          "port": "3579",
+          "icon": "/ico/7c2a676f16dcd0e07c2e8dfda0bdbc0614705df3.png"
         }
       ],
       "ip": "192.168.0.200",

@@ -8,7 +8,7 @@
         "state": "open",
         "service": "ssh",
         "name": "ssh",
-        "ico": null
+        "icon": null
       },
       {
         "port": 80,
@@ -16,7 +16,7 @@
         "state": "open",
         "service": "http",
         "name": "http",
-        "ico": null
+        "icon": null
       },
       {
         "port": 111,
@@ -24,7 +24,7 @@
         "state": "open",
         "service": "rpcbind",
         "name": "rpcbind",
-        "ico": null
+        "icon": null
       },
       {
         "port": 443,
@@ -32,7 +32,7 @@
         "state": "open",
         "service": "https",
         "name": "https",
-        "ico": null
+        "icon": null
       },
       {
         "port": 3579,
@@ -40,7 +40,7 @@
         "state": "open",
         "service": "ttat3lb",
         "name": "Ombi",
-        "ico": null
+        "icon": "/ico/96c35468427a94d6ae13bbc8c93f5c1fa6b818c0.ico"
       },
       {
         "port": 5076,
@@ -48,7 +48,7 @@
         "state": "open",
         "service": "unknown",
         "name": "NZBHydra 2",
-        "ico": null
+        "icon": "/ico/f9dca5607468a2eb17b4e38c3d916afc01654cc2.png"
       },
       {
         "port": 6789,
@@ -56,7 +56,7 @@
         "state": "open",
         "service": "ibm-db2-admin",
         "name": "NZBGet",
-        "ico": null
+        "icon": "/ico/e989227c013977f1cea10ef2119b29bf5a8274ad.png"
       },
       {
         "port": 7878,
@@ -64,7 +64,7 @@
         "state": "open",
         "service": "owms",
         "name": "Radarr",
-        "ico": "/ico/16c78f27-659d-42e2-86f4-f2ba71e3b1c8.ico"
+        "icon": "/ico/087d5b6dbd7083b58524cad2fd4b189c40c16b0f.png"
       },
       {
         "port": 8080,
@@ -72,7 +72,7 @@
         "state": "open",
         "service": "http-proxy",
         "name": "http-proxy",
-        "ico": null
+        "icon": null
       },
       {
         "port": 8112,
@@ -80,7 +80,7 @@
         "state": "open",
         "service": "unknown",
         "name": "Deluge WebUI 2.1.1",
-        "ico": "/ico/ff8ad7e5-320e-4a6e-8f51-18aee4e4c785.png"
+        "icon": "/ico/b8b058da1b3517551a1d08608637d759d3b93094.png"
       },
       {
         "port": 8888,
@@ -88,7 +88,7 @@
         "state": "open",
         "service": "sun-answerbook",
         "name": "sun-answerbook",
-        "ico": null
+        "icon": "/ico/aadf0f7a2a9552664a068f0e6901b6d10fc770e6.svg"
       },
       {
         "port": 8989,
@@ -96,7 +96,7 @@
         "state": "open",
         "service": "sunwebadmins",
         "name": "Sonarr",
-        "ico": "/ico/8427a4bb-89f2-45ce-a6a3-f545631c1936.png?h=s64FHSxrh1sgZCiBBIVikQ"
+        "icon": "/ico/6972d3f13f597ba2c28468f4098ade0426896453.png"
       },
       {
         "port": 9000,
@@ -104,7 +104,7 @@
         "state": "open",
         "service": "cslistener",
         "name": "cslistener",
-        "ico": null
+        "icon": null
       },
       {
         "port": 9001,
@@ -112,7 +112,7 @@
         "state": "open",
         "service": "tor-orport",
         "name": "MinIO Console",
-        "ico": null
+        "icon": "/ico/ea3065dc554f4c0187d59c83f846b3843517e9fe.png"
       },
       {
         "port": 9117,
@@ -120,7 +120,7 @@
         "state": "open",
         "service": "unknown",
         "name": "unknown",
-        "ico": null
+        "icon": null
       },
       {
         "port": 39867,
@@ -128,7 +128,7 @@
         "state": "open",
         "service": "unknown",
         "name": "unknown",
-        "ico": null
+        "icon": null
       },
       {
         "port": 52745,
@@ -136,7 +136,7 @@
         "state": "open",
         "service": "unknown",
         "name": "unknown",
-        "ico": null
+        "icon": null
       }
     ],
     "favorite": true,

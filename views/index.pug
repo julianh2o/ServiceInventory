@@ -19,7 +19,8 @@ mixin renderHost(host)
     ul.hideParent
       each svc in host.openPorts || []
         li(class=svc.hidden ? 'hidden' : '')
-          img(src=`http://${host.ip}:${svc.port}/favicon.ico`)
+          .iconContainer
+            img(data-service=`${host.ip}:${svc.port}` src=`${svc.icon || "/unknown.png"}`)
           +hide(host.ip,svc.port,!!svc.hidden)
           +edit(host.ip,svc.port,"name",svc.name)
           | 
@@ -43,6 +44,8 @@ html
     script(src='./script.js')
     link(rel='stylesheet' href='./style.css')
   body
+    button.btn.btn-primary(type='button' data-toggle='modal' data-target='#uploadModal') Launch demo modal
+
     .container
       ul.list-group
         each host in hosts
@@ -62,4 +65,18 @@ html
 
 
       pre= JSON.stringify(hosts,undefined,2)
+      #uploadModal.modal(tabindex='-1' role='dialog')
+        form#upload-form
+          .modal-dialog(role='document')
+            .modal-content
+              .modal-header
+                h5.modal-title Upload Icon
+                button.btn-close.closeModal(type='button')
+              .modal-body
+                input.form-control#favicon(type='file' name='favicon')
+                #upload-status
+              .modal-footer
+                button.btn.btn-primary(type='submit') Upload Favicon
+                button.btn.btn-secondary.closeModal(type='button') Close
+
 
