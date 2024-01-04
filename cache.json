@@ -1,0 +1,145 @@
+[
+  {
+    "ip": "192.168.0.200",
+    "openPorts": [
+      {
+        "port": 22,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "ssh",
+        "name": "ssh",
+        "ico": null
+      },
+      {
+        "port": 80,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "http",
+        "name": "http",
+        "ico": null
+      },
+      {
+        "port": 111,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "rpcbind",
+        "name": "rpcbind",
+        "ico": null
+      },
+      {
+        "port": 443,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "https",
+        "name": "https",
+        "ico": null
+      },
+      {
+        "port": 3579,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "ttat3lb",
+        "name": "Ombi",
+        "ico": null
+      },
+      {
+        "port": 5076,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "unknown",
+        "name": "NZBHydra 2",
+        "ico": null
+      },
+      {
+        "port": 6789,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "ibm-db2-admin",
+        "name": "NZBGet",
+        "ico": null
+      },
+      {
+        "port": 7878,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "owms",
+        "name": "Radarr",
+        "ico": "/ico/16c78f27-659d-42e2-86f4-f2ba71e3b1c8.ico"
+      },
+      {
+        "port": 8080,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "http-proxy",
+        "name": "http-proxy",
+        "ico": null
+      },
+      {
+        "port": 8112,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "unknown",
+        "name": "Deluge WebUI 2.1.1",
+        "ico": "/ico/ff8ad7e5-320e-4a6e-8f51-18aee4e4c785.png"
+      },
+      {
+        "port": 8888,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "sun-answerbook",
+        "name": "sun-answerbook",
+        "ico": null
+      },
+      {
+        "port": 8989,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "sunwebadmins",
+        "name": "Sonarr",
+        "ico": "/ico/8427a4bb-89f2-45ce-a6a3-f545631c1936.png?h=s64FHSxrh1sgZCiBBIVikQ"
+      },
+      {
+        "port": 9000,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "cslistener",
+        "name": "cslistener",
+        "ico": null
+      },
+      {
+        "port": 9001,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "tor-orport",
+        "name": "MinIO Console",
+        "ico": null
+      },
+      {
+        "port": 9117,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "unknown",
+        "name": "unknown",
+        "ico": null
+      },
+      {
+        "port": 39867,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "unknown",
+        "name": "unknown",
+        "ico": null
+      },
+      {
+        "port": 52745,
+        "protocol": "tcp",
+        "state": "open",
+        "service": "unknown",
+        "name": "unknown",
+        "ico": null
+      }
+    ],
+    "favorite": true,
+    "name": ""
+  }
+]

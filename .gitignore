@@ -1,4 +1,5 @@
 # custom ignores
+ico
 dist
 package-lock.json
 yarn.lock

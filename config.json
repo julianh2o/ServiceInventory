@@ -1,0 +1,551 @@
+{
+  "ignoreList": [
+    "upnp",
+    "https-alt",
+    "ajp13"
+  ],
+  "hosts": [
+    {
+      "openPorts": [
+        {
+          "port": 53
+        },
+        {
+          "port": 80
+        },
+        {
+          "port": 443
+        }
+      ],
+      "ip": "192.168.0.1"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.6"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.13"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.14"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 80
+        }
+      ],
+      "ip": "192.168.0.22"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.34"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 80
+        },
+        {
+          "port": 443
+        },
+        {
+          "port": 8080
+        }
+      ],
+      "ip": "192.168.0.36"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 22
+        }
+      ],
+      "ip": "192.168.0.38",
+      "favorite": ""
+    },
+    {
+      "openPorts": [
+        {
+          "port": 443
+        }
+      ],
+      "ip": "192.168.0.39"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 80
+        }
+      ],
+      "ip": "192.168.0.49"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.50"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.54"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 135
+        },
+        {
+          "port": 139
+        },
+        {
+          "port": 445
+        }
+      ],
+      "ip": "192.168.0.66"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.77"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.81"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.98"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 80
+        },
+        {
+          "port": 443
+        }
+      ],
+      "ip": "192.168.0.99"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 80
+        }
+      ],
+      "ip": "192.168.0.100"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.105"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.106"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.121"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.135"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.155"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.162"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 22
+        },
+        {
+          "port": 80
+        },
+        {
+          "port": 111
+        },
+        {
+          "port": 443
+        },
+        {
+          "port": 6789
+        },
+        {
+          "port": 8080
+        },
+        {
+          "port": 8888
+        },
+        {
+          "port": 9000
+        },
+        {
+          "port": 9001
+        }
+      ],
+      "ip": "192.168.0.166",
+      "favorite": ""
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.170"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.181"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 22
+        },
+        {
+          "port": 80,
+          "hidden": "",
+          "name": "Traefik"
+        },
+        {
+          "port": 111,
+          "hidden": true
+        },
+        {
+          "port": 443,
+          "name": "Traefik"
+        },
+        {
+          "port": 6789
+        },
+        {
+          "port": 8080,
+          "name": "Treehouse Media Dashboard"
+        },
+        {
+          "port": 8888,
+          "name": "Windmill"
+        },
+        {
+          "port": 9000,
+          "name": "Minio API",
+          "hidden": true
+        },
+        {
+          "port": 9001
+        },
+        {
+          "port": 3579
+        },
+        {
+          "port": 5076
+        },
+        {
+          "port": 7878
+        },
+        {
+          "port": 8112
+        },
+        {
+          "port": 8989
+        },
+        {
+          "port": 9117,
+          "name": "Jackett"
+        },
+        {
+          "port": 39867,
+          "hidden": true
+        },
+        {
+          "port": 52745,
+          "hidden": true
+        }
+      ],
+      "ip": "192.168.0.200",
+      "name": "Odin"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 22,
+          "hidden": true
+        },
+        {
+          "port": 80
+        },
+        {
+          "port": 139,
+          "hidden": true
+        },
+        {
+          "port": 443,
+          "hidden": true
+        },
+        {
+          "port": 445,
+          "hidden": true
+        },
+        {
+          "port": 548,
+          "hidden": true
+        },
+        {
+          "port": 3261,
+          "hidden": true
+        },
+        {
+          "port": 5001,
+          "hidden": true
+        },
+        {
+          "port": 5357,
+          "hidden": true
+        },
+        {
+          "port": 3263,
+          "hidden": true
+        },
+        {
+          "port": 3264,
+          "hidden": true
+        },
+        {
+          "port": 3265,
+          "hidden": true
+        },
+        {
+          "port": 6690,
+          "hidden": true
+        }
+      ],
+      "ip": "192.168.0.201",
+      "name": "Yggdrasil"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 21,
+          "hidden": true
+        },
+        {
+          "port": 22,
+          "hidden": true
+        },
+        {
+          "port": 80
+        },
+        {
+          "port": 111,
+          "hidden": true
+        },
+        {
+          "port": 139,
+          "hidden": true
+        },
+        {
+          "port": 443,
+          "hidden": true
+        },
+        {
+          "port": 445,
+          "hidden": true
+        },
+        {
+          "port": 548,
+          "hidden": true
+        },
+        {
+          "port": 873,
+          "hidden": true
+        },
+        {
+          "port": 2049,
+          "hidden": true
+        },
+        {
+          "port": 3261,
+          "hidden": true
+        },
+        {
+          "port": 4045,
+          "hidden": true
+        },
+        {
+          "port": 5001,
+          "hidden": true
+        },
+        {
+          "port": 5357,
+          "hidden": true
+        },
+        {
+          "port": 6789
+        },
+        {
+          "port": 8080
+        },
+        {
+          "port": 8100
+        },
+        {
+          "port": 8181
+        },
+        {
+          "port": 8888
+        },
+        {
+          "port": 662,
+          "hidden": true
+        },
+        {
+          "port": 892,
+          "hidden": true
+        },
+        {
+          "port": 3263,
+          "hidden": true
+        },
+        {
+          "port": 3264,
+          "hidden": true
+        },
+        {
+          "port": 3265,
+          "hidden": true
+        }
+      ],
+      "ip": "192.168.0.202",
+      "name": "Mimir"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.208"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.242"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 21
+        },
+        {
+          "port": 23
+        },
+        {
+          "port": 80
+        },
+        {
+          "port": 443
+        },
+        {
+          "port": 515
+        },
+        {
+          "port": 631
+        },
+        {
+          "port": 9100
+        }
+      ],
+      "ip": "192.168.0.251"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.79"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 135
+        },
+        {
+          "port": 139
+        },
+        {
+          "port": 445
+        }
+      ],
+      "ip": "host.docker.internal (192.168.0.66)"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 8008
+        }
+      ],
+      "ip": "192.168.0.154"
+    },
+    {
+      "openPorts": [],
+      "ip": "192.168.0.239"
+    },
+    {
+      "openPorts": [
+        {
+          "port": 21
+        },
+        {
+          "port": 23
+        },
+        {
+          "port": 80
+        },
+        {
+          "port": 443
+        },
+        {
+          "port": 515
+        },
+        {
+          "port": 631
+        },
+        {
+          "port": 9100
+        }
+      ],
+      "ip": "BRWA86BAD81AE2C (192.168.0.251)"
+    }
+  ]
+}

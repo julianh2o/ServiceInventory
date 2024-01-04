@@ -1,0 +1,22 @@
+.edit, .toggle {
+    margin: 0px 1px;
+}
+
+a.badge {
+    text-decoration: none;
+}
+
+.hideUntilHovered { opacity: 0 }
+li:hover > .hideUntilHovered { opacity: 1 }
+li:hover > .hideUntilHovered.dim { opacity: .4 }
+
+.hidden { display: none; color: lightgray }
+.showHidden > li.hidden { display: list-item }
+
+.toggle { background-color: var(--bs-secondary)}
+.toggle.active { background-color: var(--bs-primary)}
+
+.favorite > .bi-star-fill { display: none }
+.favorite > .bi-star { display: inline }
+.active > .bi-star-fill { display: inline }
+.active > .bi-star { display: none }

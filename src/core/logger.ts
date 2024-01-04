@@ -5,9 +5,13 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.label({ label: 'server' }),
     winston.format.simple(),
+    winston.format.errors({ stack: true }), // <-- use errors format
     winston.format.timestamp(),
-    winston.format.printf(({ level, message, label, timestamp }) => {
-      return `[${label}:${level}] ${message} (${timestamp})`;
+    winston.format.printf((info) => {
+      if (info.stack) {
+        return `${info.timestamp} [${info.label}] ${info.level}: ${info.message} ${info.stack}`;
+      }
+      return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
     })
   ),
   transports: [new winston.transports.Console()],
