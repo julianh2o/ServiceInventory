@@ -245,11 +245,12 @@ const tick = async () => {
       try {
         icon =
           svc.protocol === 'tcp' && (await downloadBestFavicon(serviceUrl));
+        icon = `/ico/${path.basename(icon)}`;
       } catch (err) {
         console.error(`Failed to download icon: ${serviceUrl} ${err.message}`);
       }
       svc.name = titleFromUrl || svc.service || '';
-      svc.icon = icon && icon.substring(1);
+      svc.icon = icon;
       return svc;
     });
     return host;
@@ -321,16 +322,18 @@ app.post('/hosts/:ip/services/:port/icon', upload.single('favicon'), async (req,
     var hash = crypto.createHash('sha1');
     hash.update(buffer);
     const name = hash.digest('hex');
-    const filename = `${ICON_DIRECTORY}/${name}.${ext}`;
+    const filename = `${name}.${ext}`;
+    const localPath = `${ICON_DIRECTORY}/${filename}`;
+    const webPath = `/ico/${filename}`;
 
     const {ip,port} = req.params;
     const serviceConfig = getConfig(ip,parseInt(port));
-    serviceConfig.icon = filename.substring(1);
+    serviceConfig.icon = webPath;
     await saveJson(config, CONFIG_PATH);
     console.log(`Uploaded icon for ${ip}:${port}`);
 
     // Saving the file
-    await fs.writeFile(filename, buffer);
+    await fs.writeFile(localPath, buffer);
 
     res.send({ message: 'File uploaded successfully', filename });
   } catch (error) {
