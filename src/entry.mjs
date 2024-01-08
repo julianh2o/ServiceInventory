@@ -15,6 +15,7 @@ import { parseFavicon } from 'parse-favicon'
 const PORT = 3000;
 const HOST_CACHE = './data/cache.json';
 const CONFIG_PATH = './data/config.json';
+const ICON_DIRECTORY = './data/ico';
 
 async function fetchFavicons(url) {
   return new Promise((resolve, reject) => {
@@ -61,7 +62,7 @@ async function downloadBestFavicon(url) {
     hash.write(buf);
     hash.end();
     const name = hash.read();
-    const filename = `./ico/${name}.${ext}`;
+    const filename = `${ICON_DIRECTORY}/${name}.${ext}`;
 
     await fs.writeFile(filename,buf);
     return filename;
@@ -297,7 +298,7 @@ const SCAN_FREQUENCY_MINUTES = 30;
 const app = express();
 app.set('view engine', 'pug');
 app.use(express.static('public'));
-app.use("/ico",express.static('./data/ico'));
+app.use("/ico",express.static(ICON_DIRECTORY));
 
 app.get('/', async (_req, res) => {
   res.render('index', {
@@ -320,7 +321,7 @@ app.post('/hosts/:ip/services/:port/icon', upload.single('favicon'), async (req,
     var hash = crypto.createHash('sha1');
     hash.update(buffer);
     const name = hash.digest('hex');
-    const filename = `./ico/${name}.${ext}`;
+    const filename = `${ICON_DIRECTORY}/${name}.${ext}`;
 
     const {ip,port} = req.params;
     const serviceConfig = getConfig(ip,parseInt(port));
