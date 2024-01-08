@@ -8,5 +8,5 @@ services:
     environment:
       - ENV_VAR_NAME=value
     volumes:
-      - ./data:/app/data
+      - ./data:/opt/app/data
     restart: on-failure
