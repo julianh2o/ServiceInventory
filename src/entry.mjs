@@ -11,6 +11,7 @@ import { fileTypeFromBuffer } from 'file-type';
 import crypto from "crypto";
 import multer from "multer";
 import { parseFavicon } from 'parse-favicon'
+import path from "path";
 
 const PORT = 3000;
 const HOST_CACHE = './data/cache.json';
@@ -218,6 +219,7 @@ let hosts = [];
 const tick = async () => {
   console.time('Port scan');
   const newHosts = await scan('192.168.0.0/24', true);
+  // const newHosts = await scan('192.168.0.200', true);
   console.log(`Found ${newHosts.length} hosts..`);
   const processedHosts = await p.mapSeries(newHosts, async (hostRaw) => {
     const host = _.cloneDeep(hostRaw);
@@ -245,12 +247,13 @@ const tick = async () => {
       try {
         icon =
           svc.protocol === 'tcp' && (await downloadBestFavicon(serviceUrl));
-        icon = `/ico/${path.basename(icon)}`;
+        icon = icon && `/ico/${path.basename(icon)}`;
       } catch (err) {
         console.error(`Failed to download icon: ${serviceUrl} ${err.message}`);
       }
       svc.name = titleFromUrl || svc.service || '';
       svc.icon = icon;
+      console.log(icon);
       return svc;
     });
     return host;
