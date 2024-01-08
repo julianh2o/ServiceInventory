@@ -1,6 +1,5 @@
 # custom ignores
-ico
-dist
+data
 package-lock.json
 yarn.lock
 

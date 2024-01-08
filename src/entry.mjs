@@ -1,6 +1,5 @@
 import 'express-async-errors';
 import express from 'express';
-import nmap from 'node-nmap';
 import fs from 'fs/promises';
 import _ from 'lodash';
 import axios from 'axios';
@@ -8,24 +7,22 @@ import cheerio from 'cheerio';
 import p from 'p-iteration';
 import bodyParser from 'body-parser';
 import { spawn } from 'child_process';
-import { createWriteStream } from 'fs';
-import path from 'path';
-import * as uuid from 'uuid';
 import { fileTypeFromBuffer } from 'file-type';
 import crypto from "crypto";
 import multer from "multer";
 import { parseFavicon } from 'parse-favicon'
 
-const PORT = 4004;
-const HOST = "localhost";
+const PORT = 3000;
+const HOST_CACHE = './data/cache.json';
+const CONFIG_PATH = './data/config.json';
 
 async function fetchFavicons(url) {
   return new Promise((resolve, reject) => {
     const results  = [];
     parseFavicon(
       url,
-      async (url) => fetch(url).then(res => res.text()),
-      async (rel) => fetch(`${url}${rel}`).then(res => res.arrayBuffer())
+      async (url) => axios.get(url, {timeout: 1000}).then(res => res.data),
+      async (rel) => axios.get(`${url}${rel}`, {timeout: 1000, responseType: 'arraybuffer'}).then(res => res.data)
     ).subscribe({
       next(icon) { results.push(icon) },
       error(err) { reject(err) },
@@ -34,41 +31,20 @@ async function fetchFavicons(url) {
   })
 }
 
-async function downloadLargestFavicon(url) {
+async function downloadBestFavicon(url) {
   console.log(`Downloading Favicon for ${url}`)
-  const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
   try {
-    // Fetch the HTML content of the website
-    if (url.includes("6789")) {
-      const favicons = await fetchFavicons(url);
-      console.log(favicons);
-    }
-    const response = await axios.get(url);
-    const html = response.data;
+    const favicons = await fetchFavicons(url);
 
-    // Load the HTML content into Cheerio
-    const $ = cheerio.load(html);
+    // The best favicon is the one that's closest to 50 pixels wide
+    const guessSize = (icon) => _.isArray(icon.size) ? _.max(_.map(icon.size,"width")) : _.get(icon,"size.width") || 0
+    const utilityScore = (icon) => -Math.abs(guessSize(icon) - 50);
 
-    // Find all favicon links in the HTML
-    const faviconLinks = $('link[rel="icon"], link[rel="shortcut icon"]');
+    const sortedFavicons = _.sortBy(favicons,icon => utilityScore(icon))
 
-    let largestFaviconUrl = '';
-    let largestFaviconSize = 0;
+    if (!sortedFavicons.length) throw new Error('No favicon found on the website ' + url);
 
-    // Iteratethrough the favicon links to find the largest one
-
-    faviconLinks.each((_index, element) => {
-      const faviconUrl = $(element).attr('href');
-      const faviconSizeStr = $(element).attr('sizes');
-      const faviconSize = faviconSizeStr ? parseInt(faviconSizeStr) : 0;
-
-      if (!largestFaviconSize || faviconSize > largestFaviconSize) {
-        largestFaviconSize = faviconSize;
-        largestFaviconUrl = faviconUrl || '';
-      }
-    });
-
-    if (!largestFaviconUrl) throw new Error('No favicon found on the website ' + url);
+    let largestFaviconUrl = _.last(sortedFavicons).url
 
     if (largestFaviconUrl.startsWith(".")) largestFaviconUrl = largestFaviconUrl.substring(1);
     if (!largestFaviconUrl.startsWith("/")) largestFaviconUrl = `/${largestFaviconUrl}`;
@@ -99,7 +75,7 @@ function runNmap(host, fast){
     const args = [];
 
     if (fast) {
-      args.push('-sS', '-F');
+      args.push('-sn');
     } else {
       args.push('-sS', '-T5', '-p-');
       // args.push('-sT', '-p 1-10000');
@@ -140,7 +116,8 @@ function parseNmapOutput(output) {
       if (currentHost !== null) {
         hosts.push(currentHost);
       }
-      const ip = line.split('Nmap scan report for ')[1].trim();
+      let ip = line.split('Nmap scan report for ')[1].trim();
+      if (ip.includes("(")) ip = ip.substring(ip.indexOf("(")+1,ip.indexOf(")"));
       currentHost = {
         ip,
         openPorts: [],
@@ -194,9 +171,6 @@ async function getTitleFromUrl(url) {
   }
 }
 
-const HOST_CACHE = './cache.json';
-const CONFIG_PATH = './config.json';
-
 const scan = async (host, fast) => {
   console.log(`Starting scan: ${host} ${fast ? '(fast)' : ''}`);
   console.time(`Scan ${host} ${fast ? '(fast)' : ''}`);
@@ -204,23 +178,6 @@ const scan = async (host, fast) => {
   const parsed = parseNmapOutput(raw);
   console.timeEnd(`Scan ${host} ${fast ? '(fast)' : ''}`);
   return parsed;
-};
-
-const scanNmap = async (host, fast) => {
-  return new Promise((resolve, reject) => {
-    console.log(`Starting scan: ${host} ${fast ? '(fast)' : ''}`);
-    console.time(`Scan ${host} ${fast ? '(fast)' : ''}`);
-    const scan = new nmap.NmapScan(host, fast ? '-sT -F' : '-sT -p-');
-    scan.on('complete', function (data) {
-      resolve(data);
-      console.timeEnd(`Scan ${host} ${fast ? '(fast)' : ''}`);
-    });
-    scan.on('error', function (err) {
-      reject(err);
-      console.timeEnd(`Scan ${host} ${fast ? '(fast)' : ''}`);
-    });
-    scan.startScan();
-  });
 };
 
 const loadJson = async (p, defaultValue) => {
@@ -259,11 +216,14 @@ const getConfig = (ip, port) => {
 let hosts = [];
 const tick = async () => {
   console.time('Port scan');
-  const newHosts = await scan('192.168.0.200', true);
+  const newHosts = await scan('192.168.0.0/24', true);
+  console.log(`Found ${newHosts.length} hosts..`);
   const processedHosts = await p.mapSeries(newHosts, async (hostRaw) => {
     const host = _.cloneDeep(hostRaw);
     host.openPorts = host.openPorts ?? [];
     const hostConfig = getConfig(host.ip);
+    if (!hostConfig.firstSeen) hostConfig.firstSeen = new Date().getTime();
+    hostConfig.lastSeen = new Date().getTime();
     host.favorite =
       hostConfig.favorite ?? !!_.find(host.openPorts, { service: 'ssh' });
     host.name = host.hostname ?? '';
@@ -277,10 +237,13 @@ const tick = async () => {
         svc.protocol === 'tcp' &&
         svc.service !== 'jetdirect' &&
         (await getTitleFromUrl(serviceUrl));
+      const serviceConfig = getConfig(host.ip,svc.port);
+      if (!serviceConfig.firstSeen) hostConfig.firstSeen = new Date().getTime();
+      serviceConfig.lastSeen = new Date().getTime();
       let icon = null;
       try {
         icon =
-          svc.protocol === 'tcp' && (await downloadLargestFavicon(serviceUrl));
+          svc.protocol === 'tcp' && (await downloadBestFavicon(serviceUrl));
       } catch (err) {
         console.error(`Failed to download icon: ${serviceUrl} ${err.message}`);
       }
@@ -312,7 +275,7 @@ const processHosts = async (hosts, config) => {
     return host;
   });
 
-  processed = _.reject(processed, (host) => host.openPorts.length === 0);
+  // processed = _.reject(processed, (host) => host.openPorts.length === 0);
 
   return processed;
 };
@@ -334,12 +297,10 @@ const SCAN_FREQUENCY_MINUTES = 30;
 const app = express();
 app.set('view engine', 'pug');
 app.use(express.static('public'));
-app.use("/ico",express.static('ico'));
+app.use("/ico",express.static('./data/ico'));
 
 app.get('/', async (_req, res) => {
   res.render('index', {
-    title: 'Hey',
-    message: 'Hello there!',
     hosts: await processHosts(hosts, config),
   });
 });
@@ -352,7 +313,8 @@ app.post('/hosts/:ip/services/:port/icon', upload.single('favicon'), async (req,
     }
 
     const buffer = req.file.buffer;
-    const { ext } = await fileTypeFromBuffer(buffer);
+    let { ext } = await fileTypeFromBuffer(buffer);
+    if (ext === "xml") ext = "svg";
 
     // Generating a SHA-1 hash of the file's content
     var hash = crypto.createHash('sha1');
@@ -395,7 +357,7 @@ app.use('/_healthcheck', (_req, res) => {
 });
 
 async function main() {
-  await app.listen({ port: PORT, host: HOST }, async () => {
+  await app.listen(PORT, async () => {
     hosts = await loadJson(HOST_CACHE, []);
     config = await loadJson(CONFIG_PATH, defaultConfig);
     // const res = await downloadLargestFavicon("http://192.168.0.200:5076/");
@@ -403,7 +365,7 @@ async function main() {
     await tick();
     setTimeout(tick, SCAN_FREQUENCY_MINUTES * 60 * 60 * 1000);
   });
-  console.log(`Running at http://${HOST}:${PORT}`);
+  console.log(`Running at http://localhost:${PORT}`);
 }
 
 app.use((err, req, res, next) => {

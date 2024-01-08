@@ -1,10 +1,10 @@
 {
   "private": true,
-  "name": "node-typescript",
+  "name": "service-inventory",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/entry.mjs"
+    "start": "nodemon src/entry.mjs"
   },
   "dependencies": {
     "@types/express": "4.17.21",
